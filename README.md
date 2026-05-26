@@ -41,12 +41,30 @@ pattern-detection/
 
 ---
 
+### Web Demo (demo.py)
+
+[Open your browser at Hugging Face Space](https://huggingface.co/spaces/JakeLee111/Pattern-Detection-System)
+
+Upload:
+- A **pattern image** (the symbol/shape you want to find)
+- A **drawing image** (the full drawing to search within)
+
+The demo will return:
+- Annotated output image with bounding boxes
+- JSON list of detections with coordinates and confidence scores
+
+  
+---
+
 ## ⚙️ Installation
 
 ### 1. Clone the repository
 
 ```bash
 git clone https://github.com/JakeLee111/ZeroShot-BOM-Pattern-Detection
+```
+
+```
 cd pattern-detection
 ```
 
@@ -63,20 +81,6 @@ venv\Scripts\activate           # Windows
 ```bash
 pip install -r requirements.txt
 ```
-
----
-
-### Web Demo (demo.py)
-
-Open your browser at `https://huggingface.co/spaces/JakeLee111/Pattern-Detection-System`
-
-Upload:
-- A **pattern image** (the symbol/shape you want to find)
-- A **drawing image** (the full drawing to search within)
-
-The demo will return:
-- Annotated output image with bounding boxes
-- JSON list of detections with coordinates and confidence scores
 
 
 ---
