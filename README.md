@@ -6,6 +6,7 @@
 ![OpenCV](https://img.shields.io/badge/OpenCV-4.x-green?style=flat-square&logo=opencv)
 ![Gradio](https://img.shields.io/badge/Gradio-3.x-orange?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)
+[![Hugging Face Spaces](https://img.shields.io/badge/HuggingFace-Spaces-yellow)](https://huggingface.co/spaces/JakeLee111/Pattern-Detection-System)
 
 ---
 
