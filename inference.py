@@ -5,26 +5,23 @@ import numpy as np
 # LOAD IMAGES
 # =========================================================
 
-pattern = cv2.imread("examples/pattern.jpg", 0)
-drawing = cv2.imread("examples/drawing.jpg", 0)
+pattern = cv2.imread("examples/pattern.jpg", 0)   # grayscale
+drawing = cv2.imread("examples/drawing.jpg", 0)   # grayscale
 
 if pattern is None:
-    raise ValueError("Pattern image not found")
+    raise ValueError("Pattern image not found at examples/pattern.jpg")
 
 if drawing is None:
-    raise ValueError("Drawing image not found")
+    raise ValueError("Drawing image not found at examples/drawing.jpg")
 
 # =========================================================
-# OUTPUT IMAGE
+# OUTPUT IMAGE (BGR for drawing colored boxes)
 # =========================================================
 
-output = cv2.cvtColor(
-    drawing.copy(),
-    cv2.COLOR_GRAY2BGR
-)
+output = cv2.cvtColor(drawing.copy(), cv2.COLOR_GRAY2BGR)
 
 # =========================================================
-# IMAGE INFO
+# IMAGE DIMENSIONS
 # =========================================================
 
 H, W = drawing.shape
@@ -39,6 +36,8 @@ print(f"Pattern : {w0}x{h0}")
 
 # =========================================================
 # ESTIMATE TARGET SCALE
+# Assume the pattern appears at ~EXPECTED_OBJECT_WIDTH pixels
+# wide in the drawing. Adjust this if results are off.
 # =========================================================
 
 EXPECTED_OBJECT_WIDTH = 60
@@ -48,7 +47,7 @@ estimated_scale = EXPECTED_OBJECT_WIDTH / w0
 print("\nEstimated scale:", estimated_scale)
 
 # =========================================================
-# SEARCH AROUND ESTIMATED SCALE
+# SEARCH RANGE: ±40% around estimated scale, 30 steps
 # =========================================================
 
 SCALES = np.linspace(
@@ -58,23 +57,22 @@ SCALES = np.linspace(
 )
 
 # =========================================================
-# ROTATION ANGLES
+# ROTATION ANGLES (degrees)
+# Tests 4 cardinal rotations to handle axis-aligned symbols
 # =========================================================
 
-ROTATIONS = [
-    0,
-    90,
-    180,
-    270
-]
+ROTATIONS = [0, 90, 180, 270]
 
+# Minimum similarity score to count as a match (0.0–1.0)
 THRESHOLD = 0.8
 
 boxes = []
 scores = []
 
 # =========================================================
-# TEMPLATE MATCHING
+# TEMPLATE MATCHING LOOP
+# For each rotation × scale combination, run matchTemplate
+# and collect all positions above THRESHOLD
 # =========================================================
 
 print("\n====================================")
@@ -95,22 +93,13 @@ for angle in ROTATIONS:
         rotated_pattern = pattern.copy()
 
     elif angle == 90:
-        rotated_pattern = cv2.rotate(
-            pattern,
-            cv2.ROTATE_90_CLOCKWISE
-        )
+        rotated_pattern = cv2.rotate(pattern, cv2.ROTATE_90_CLOCKWISE)
 
     elif angle == 180:
-        rotated_pattern = cv2.rotate(
-            pattern,
-            cv2.ROTATE_180
-        )
+        rotated_pattern = cv2.rotate(pattern, cv2.ROTATE_180)
 
     elif angle == 270:
-        rotated_pattern = cv2.rotate(
-            pattern,
-            cv2.ROTATE_90_COUNTERCLOCKWISE
-        )
+        rotated_pattern = cv2.rotate(pattern, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
     # =====================================================
     # SCALE SEARCH
@@ -127,10 +116,9 @@ for angle in ROTATIONS:
 
         h, w = resized_pattern.shape
 
-        # Skip invalid size
+        # Skip if pattern is too small or larger than drawing
         if h < 10 or w < 10:
             continue
-
         if h > H or w > W:
             continue
 
@@ -139,6 +127,8 @@ for angle in ROTATIONS:
 
         # =================================================
         # MATCH TEMPLATE
+        # TM_CCOEFF_NORMED: normalized cross-correlation
+        # Score range: [-1, 1], higher = more similar
         # =================================================
 
         result = cv2.matchTemplate(
@@ -148,32 +138,28 @@ for angle in ROTATIONS:
         )
 
         max_similarity = result.max()
-
         print(f"Max similarity: {max_similarity:.4f}")
 
         # =================================================
-        # FIND MATCHES
+        # COLLECT MATCHES ABOVE THRESHOLD
         # =================================================
 
         locations = np.where(result >= THRESHOLD)
-
         match_count = 0
 
         for pt in zip(*locations[::-1]):
-
             x, y = pt
-
             score = result[y, x]
-
             boxes.append([x, y, w, h])
             scores.append(float(score))
-
             match_count += 1
 
         print(f"Matches: {match_count}")
 
 # =========================================================
-# NMS
+# NON-MAXIMUM SUPPRESSION
+# Removes duplicate overlapping boxes, keeping highest score
+# IoU threshold 0.3: boxes overlapping >30% area are merged
 # =========================================================
 
 print("\n====================================")
@@ -202,16 +188,10 @@ if len(indices) > 0:
         x, y, w, h = boxes[i]
         score = scores[i]
 
-        # RED BOX
-        cv2.rectangle(
-            output,
-            (x, y),
-            (x + w, y + h),
-            (0, 0, 255),
-            2
-        )
+        # Red bounding box
+        cv2.rectangle(output, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
-        # SCORE
+        # Confidence score above box
         cv2.putText(
             output,
             f"{score:.2f}",
@@ -239,7 +219,6 @@ print("FINAL REPORT")
 print("====================================")
 
 print("Final detections:", final_count)
-
 print("\nOutput saved as output.png")
 
 print("\nPipeline:")
