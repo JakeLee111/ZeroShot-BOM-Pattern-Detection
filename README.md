@@ -19,6 +19,8 @@ This system detects occurrences of a **pattern image** within a larger **drawing
 - **Non-Maximum Suppression (NMS)** — removes duplicate bounding boxes
 - **Confidence scoring** — ranks detections by similarity score
 
+![Detection Result](examples/Result.png)
+
 ---
 
 ## 📁 Repository Structure
