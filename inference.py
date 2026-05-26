@@ -52,8 +52,8 @@ print("\nEstimated scale:", estimated_scale)
 # =========================================================
 
 SCALES = np.linspace(
-    estimated_scale * 0.7,
-    estimated_scale * 1.3,
+    estimated_scale * 0.4,
+    estimated_scale * 1.2,
     30
 )
 
@@ -68,7 +68,7 @@ ROTATIONS = [
     270
 ]
 
-THRESHOLD = 0.45
+THRESHOLD = 0.8
 
 boxes = []
 scores = []
