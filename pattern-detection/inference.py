@@ -5,8 +5,8 @@ import numpy as np
 # LOAD IMAGES
 # =========================================================
 
-pattern = cv2.imread("examples/pattern3.png", 0)   # grayscale
-drawing = cv2.imread("examples/drawing.jpg", 0)   # grayscale
+pattern = cv2.imread("../examples/pattern1.png", 0)   # grayscale
+drawing = cv2.imread("../examples/drawing.jpg", 0)   # grayscale
 
 if pattern is None:
     raise ValueError("Pattern image not found at examples/pattern.jpg")
